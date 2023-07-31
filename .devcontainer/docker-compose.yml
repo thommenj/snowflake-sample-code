@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  app:
+    build:
+      context: .
+      args:
+        SNOWFLAKE_USER : ${SNOWFLAKE_USER}
+        SNOWFLAKE_PASSWORD : ${SNOWFLAKE_PASSWORD}
+        SNOWFLAKE_DB : ${SNOWFLAKE_DB}
+        SNOWFLAKE_VW : ${SNOWFLAKE_VW}
+        SNOWFLAKE_ACCOUNT : ${SNOWFLAKE_ACCOUNT}

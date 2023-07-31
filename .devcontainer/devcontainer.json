@@ -1,0 +1,41 @@
+{
+    "name": "snowflake-sample-code",
+    "build": {
+        "dockerfile": "./Dockerfile",
+        "context": "."
+    },
+    "customizations": {
+        "codespaces": {
+            "openFiles": ["./README.md"]
+        },
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/opt/conda/bin/python",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "python.formatting.autopep8Path": "/opt/conda/bin/autopep8",
+                "python.formatting.yapfPath": "/opt/conda/bin/yapf",
+                "python.linting.flake8Path": "/opt/conda/bin/flake8",
+                "python.linting.pycodestylePath": "/opt/conda/bin/pycodestyle",
+                "python.linting.pydocstylePath": "/opt/conda/bin/pydocstyle",
+                "python.linting.pylintPath": "/opt/conda/bin/pylint",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                }
+            },
+            "extensions": [
+                "ms-python.isort",
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-toolsai.jupyter",
+                "ms-toolsai.jupyter-keymap",
+                "ms-toolsai.jupyter-renderers",
+                "ms-toolsai.vscode-jupyter-cell-tags",
+                "ms-toolsai.vscode-jupyter-slideshow"
+            ]
+        }
+    },
+    "remoteUser": "root"
+}
