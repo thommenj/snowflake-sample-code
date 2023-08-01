@@ -16,7 +16,7 @@ $$
 import xlrd
 import pandas as pd
 from snowflake.snowpark.files import SnowflakeFile
-
+from datetime import datetime
 
 class FileFormat:
     def __init__(self, order_date: str, allocation_date: str, so_number: str, so_line: str, cust_po: str, end_user_po: str, account_rep: str, p_line: str, td_pn: str, manuf_pn: str):
@@ -42,21 +42,33 @@ class FileFormat:
         "This (Magic/Dunder) method deletes the object from memory"
         pass
 
-
 def main(session, file_path):
     with SnowflakeFile.open(file_path, 'rb') as file:
         binary_data = file.read()
 
-    workbooks = xlrd.open_workbook(file_contents=binary_data, on_demand=True)
+    workbook = xlrd.open_workbook(file_contents=binary_data, on_demand=True)
 
-    worksheet = workbooks.sheet_by_index(0)
+    worksheet = workbook.sheet_by_index(0)
 
     data = []
 
     for row in range(1, worksheet.nrows):
+        
+        order_date = worksheet.cell(row, 0).value
+        if order_date == '':
+            order_date = None
+        else:
+            order_date = datetime(*xlrd.xldate_as_tuple(order_date, workbook.datemode)).strftime('%Y-%m-%d')
+        
+        allocation_date = worksheet.cell(row, 1).value
+        if allocation_date == '':
+            allocation_date = None
+        else:
+            allocation_date = datetime(*xlrd.xldate_as_tuple(allocation_date, workbook.datemode)).strftime('%Y-%m-%d')
+        
         file_row = FileFormat(
-            order_date=worksheet.cell(row, 0).value,
-            allocation_date=worksheet.cell(row, 1).value,
+            order_date=order_date,
+            allocation_date=allocation_date,
             so_number=worksheet.cell(row, 2).value,
             so_line=worksheet.cell(row, 3).value,
             cust_po=worksheet.cell(row, 4).value,
