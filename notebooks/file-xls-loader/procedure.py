@@ -85,13 +85,20 @@ def main(session, file_path):
 
     snowpark_df = session.create_dataframe(df)
 
-    snowpark_df.write.mode("overwrite").save_as_table("XLS_TABLE_STAGE")
+    # Truncate the table
+    session.execute("TRUNCATE TABLE NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE")
+
+    # Load data
+    snowpark_df.write.mode("append").save_as_table("NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE")
 
     return "Succeeded"
 
 $$;
 
-
 CALL NOTEBOOKS.PUBLIC.XLS_LOADER_SP(BUILD_SCOPED_FILE_URL(@NOTEBOOKS.PUBLIC.XLS_LAKE,'/testing.xls'));
+
+SELECT * FROM NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE;
+
+SHOW TABLES;
 
 SELECT * FROM NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE;
