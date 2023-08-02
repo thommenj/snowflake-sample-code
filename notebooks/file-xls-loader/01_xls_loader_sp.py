@@ -1,18 +1,18 @@
-# USE ROLE SYSADMIN;
-# USE DATABASE NOTEBOOKS;
-# USE SCHEMA PUBLIC;
-# USE WAREHOUSE NOTEBOOKS;
+USE ROLE SYSADMIN;
+USE DATABASE NOTEBOOKS;
+USE SCHEMA PUBLIC;
+USE WAREHOUSE NOTEBOOKS;
 
-# CREATE OR REPLACE PROCEDURE NOTEBOOKS.PUBLIC.XLS_LOADER_SP(file_path string)
-# RETURNS STRING
-# LANGUAGE PYTHON
-# RUNTIME_VERSION = '3.10'
-# PACKAGES = ('snowflake-snowpark-python', 'pandas', 'xlrd')
-# HANDLER = 'main'
-# COMMENT = 'Created by Enrique Plata, this procedure reads and loads an xls file to a table'
-# EXECUTE AS CALLER
-# AS
-# $$
+CREATE OR REPLACE PROCEDURE NOTEBOOKS.PUBLIC.XLS_LOADER_SP(file_path string)
+RETURNS STRING
+LANGUAGE PYTHON
+RUNTIME_VERSION = '3.10'
+PACKAGES = ('snowflake-snowpark-python', 'pandas', 'xlrd')
+HANDLER = 'main'
+COMMENT = 'Created by Enrique Plata, this procedure reads and loads an xls file to a table'
+EXECUTE AS CALLER
+AS
+$$
 import xlrd
 import pandas as pd
 from snowflake.snowpark.files import SnowflakeFile
@@ -86,19 +86,22 @@ def main(session, file_path):
     snowpark_df = session.create_dataframe(df)
 
     # Truncate the table
-    session.execute("TRUNCATE TABLE NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE")
+    session.sql("TRUNCATE TABLE NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE").collect()
 
     # Load data
     snowpark_df.write.mode("append").save_as_table("NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE")
 
     return "Succeeded"
 
-# $$;
+$$;
 
-# CALL NOTEBOOKS.PUBLIC.XLS_LOADER_SP(BUILD_SCOPED_FILE_URL(@NOTEBOOKS.PUBLIC.XLS_LAKE,'/testing.xls'));
+# 1.- Load file in stage
 
-# SELECT * FROM NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE;
+# 2.- Call procedure
+CALL NOTEBOOKS.PUBLIC.XLS_LOADER_SP(BUILD_SCOPED_FILE_URL(@NOTEBOOKS.PUBLIC.XLS_LAKE,'/testing.xls'));
 
-# SHOW TABLES;
+# 3.- Check results
+SELECT * FROM NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE;
 
-# SELECT * FROM NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE;
+# 4.- Check results in stream
+SELECT * FROM NOTEBOOKS.PUBLIC.XLS_TABLE_STAGE_STREAM;
