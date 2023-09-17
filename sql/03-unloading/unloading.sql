@@ -35,4 +35,6 @@ FILE_FORMAT = (FORMAT_NAME = SNOWPROCORE.PUBLIC.FILE_FORMAT_CSV_GENERIC)
 ;
 
 --****************************** 3.- Downloading to local ******************************
+-- Please refer to the following https://docs.snowflake.com/en/user-guide/data-unload-snowflake
 GET @SNOWPROCORE.PUBLIC.STAGE_INTERNAL_ACCOUNTS/TRANSFORMED_ACCOUNTS/data_0_0_0.csv.gz file:///Users/eplata/Developer/personal/snowflake-sample-code/sql/03-unloading/data_0_0_0.csv.gz;
+-- gunzip data_0_0_0.csv.gz
