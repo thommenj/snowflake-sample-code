@@ -68,23 +68,3 @@ FROM SNOWPROCORE.PUBLIC.TEST_NO_EXPLICIT_TIMETRAVEL BEFORE(STATEMENT => '<<<CHAN
 --FROM TEST_NO_EXPLICIT_TIMETRAVEL AT(OFFSET => -60*9)
 ;
 SELECT * FROM SNOWPROCORE.PUBLIC.TEST_NO_EXPLICIT_TIMETRAVEL_2;
-
-/***** 5. Create schema based on another schema with time travel.
-*****/
-create schema restored_schema clone my_schema at(offset => -3600);
-
-/***** 8. Sintax for time travel
-*****/
-
---creates a clone of a table as of the date and time represented by the specified timestamp:
-CREATE TABLE RESTORED_TABLE CLONE MY_TABLE
-  AT(TIMESTAMP => 'MON, 09 MAY 2015 01:01:00 +0300'::TIMESTAMP_TZ);
-
---The following CREATE SCHEMA command creates a clone of a schema and all its
---objects as they existed 1 hour before the current time:
-CREATE SCHEMA RESTORED_SCHEMA CLONE MY_SCHEMA AT(OFFSET => -3600);
-
- --The following CREATE DATABASE command creates a clone of a database and
- --all its objects as they existed prior to the completion of the specified statement:
-CREATE DATABASE RESTORED_DB CLONE MY_DB
-  BEFORE(STATEMENT => '');
