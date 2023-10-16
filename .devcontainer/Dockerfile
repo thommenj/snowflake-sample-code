@@ -22,9 +22,9 @@ ENV LD_LIBRARY_PATH /usr/local/lib:$LD_LIBRARY_PATH
 ENV OPENSSL_LIB_DIR /usr/local/lib
 
 # Setting up Snowpark conda environment
-FROM packageinstaller AS condadeps
-COPY environment.yml /tmp/installation-scripts/
-RUN /opt/conda/bin/conda env update --name base -f /tmp/installation-scripts/environment.yml
+#FROM packageinstaller AS condadeps
+#COPY environment.yml /tmp/installation-scripts/
+#RUN /opt/conda/bin/conda env update --name base -f /tmp/installation-scripts/environment.yml
 
 # Copy environment.yml (if found) to a temp location so we update the environment. Also
 # copy "noop.txt" so the COPY instruction does not fail if no environment.yml exists.
