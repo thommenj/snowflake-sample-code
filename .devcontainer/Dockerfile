@@ -12,7 +12,7 @@ ENV PYTHONUNBUFFERED 1
 FROM base as packageinstaller
 USER root
 RUN apt-get update && \
-    apt-get -y install curl libssl-dev --no-install-recommends && \
+    apt-get -y install curl --no-install-recommends && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
@@ -23,9 +23,8 @@ ENV OPENSSL_LIB_DIR /usr/local/lib
 
 # Setting up Snowpark conda environment
 FROM packageinstaller AS condadeps
-RUN /opt/conda/bin/conda create --name snowpark --override-channels -c https://repo.anaconda.com/pkgs/snowflake python=3.10
-#COPY environment.yml /tmp/installation-scripts/
-#RUN /opt/conda/bin/conda env update --name snowpark -f /tmp/installation-scripts/environment.yml
+COPY environment.yml /tmp/installation-scripts/
+RUN /opt/conda/bin/conda env update --name base -f /tmp/installation-scripts/environment.yml
 
 # Copy environment.yml (if found) to a temp location so we update the environment. Also
 # copy "noop.txt" so the COPY instruction does not fail if no environment.yml exists.
