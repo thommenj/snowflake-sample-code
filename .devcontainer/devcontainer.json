@@ -15,6 +15,7 @@
         }
     },
     "forwardPorts": [8888],
+    "waitFor": "onCreateCommand",
     "customizations": {
         "codespaces": {
             "openFiles": ["./README.md"]
