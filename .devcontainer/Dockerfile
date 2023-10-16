@@ -1,5 +1,5 @@
 # Use an existing image as a base
-FROM mcr.microsoft.com/devcontainers/anaconda:0.203-3 as base
+FROM mcr.microsoft.com/devcontainers/anaconda:0.203.0-3 as base
 
 # Add metadata
 LABEL maintainer="Enrique Plata"
