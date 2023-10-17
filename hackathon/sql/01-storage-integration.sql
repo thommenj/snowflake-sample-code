@@ -1,0 +1,10 @@
+USE ROLE ACCOUNTADMIN;
+
+CREATE OR REPLACE STORAGE INTEGRATION S3_BUCKET_INTEGRATION
+  TYPE = EXTERNAL_STAGE
+  STORAGE_PROVIDER = 'S3'
+  ENABLED = TRUE
+  STORAGE_AWS_ROLE_ARN = '<iam_role>'
+  STORAGE_ALLOWED_LOCATIONS = ('s3://snowflake-ep-hackathon/json/', 's3://snowflake-ep-hackathon/excel/', 's3://snowflake-ep-hackathon/streaming/');
+
+DESCRIBE INTEGRATION S3_BUCKET_INTEGRATION;
