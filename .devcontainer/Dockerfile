@@ -1,39 +1,50 @@
-# Use an existing image as a base
-FROM mcr.microsoft.com/devcontainers/anaconda:0.204-3 as base
+# This is the base image, which has miniconda installed.
+# You could use the 'anaconda' base image too; however the docker image 
+# size will be large feel free to change it to your needs.
+#
+# There are 2 versions of the FROM statement.
+# - The '--platform=linux/amd64' allows us to work locally, If you have a ARM-based system (e.g. Apple M1 M2...).
+#       However, this version has issues when running a streamlit app either in the
+#       local(docker) environment and also in a Github Codespace.
+#
+# - The one without the 'platform' allows you to run streamlit in a Github Codespace,
+#       However, this means that streamlit app cannot be developed via the local(docker)
+#       environment. 
 
-# Add metadata
+# This is the base image
+#FROM --platform=linux/amd64 continuumio/miniconda3 AS base
+FROM continuumio/miniconda3 AS base
 LABEL maintainer="Enrique Plata"
-
-# Set environment variables to ensure Python doesn't create .pyc files
+ENV APP_HOME /opt/notebooks
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Update the container OS, install curl and OpenSSL
-FROM base as packageinstaller
+# Update container OS and pip
+FROM base AS installer
 USER root
 RUN apt-get update && \
-    apt-get -y install curl --no-install-recommends && \
-    apt-get autoremove -y && \
-    apt-get clean -y && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y curl unzip && \
+    echo "running in codespace" > /tmp/.is_codespace_env.txt # Used by execution script to verify if we are running in a codespace docker environment
+SHELL ["conda", "run", "/bin/bash", "-c"]
+RUN pip install --upgrade pip
+RUN pip install --upgrade \
+    snowflake-connector-python[pandas] \
+    snowflake-sqlalchemy
 
-# Set the LD_LIBRARY_PATH and OPENSSL_LIB_DIR environment variables
-ENV LD_LIBRARY_PATH /usr/local/lib:$LD_LIBRARY_PATH
-ENV OPENSSL_LIB_DIR /usr/local/lib
+#Setting up Snowpark Python conda environment
+FROM installer AS deps
+COPY environment.yml* /tmp/installation-scripts/
+RUN conda create -n snowparkenv -c https://repo.anaconda.com/pkgs/snowflake python=3.8
+SHELL ["conda", "run", "-n", "snowparkenv", "/bin/bash", "-c"]
+RUN /opt/conda/bin/conda env update -f /tmp/installation-scripts/environment.yml
 
-# Setting up Snowpark conda environment
-#FROM packageinstaller AS condadeps
-#COPY environment.yml /tmp/installation-scripts/
-#RUN /opt/conda/bin/conda env update --name base -f /tmp/installation-scripts/environment.yml
+#Deploying Snowflake Connectors and Drivers
+COPY install_snowflake.sh* /tmp/installation-scripts/
+USER root
+SHELL ["/bin/bash", "-c"]
+RUN chmod +x /tmp/installation-scripts/install_snowflake.sh \
+    && /tmp/installation-scripts/install_snowflake.sh \
+    && rm -rf /tmp/installation-scripts/*
 
-# Copy environment.yml (if found) to a temp location so we update the environment. Also
-# copy "noop.txt" so the COPY instruction does not fail if no environment.yml exists.
-# COPY ./environment.yml* ./noop.txt /tmp/conda-tmp/
-# RUN if [ -f "/tmp/conda-tmp/environment.yml" ]; then umask 0002 && /opt/conda/bin/conda env update -n base -f /tmp/conda-tmp/environment.yml; fi \
-#     && rm -rf /tmp/conda-tmp
-
-# RUN conda install snowflake-snowpark-python numpy=1.23.5 pandas=1.5.2 openpyxl=3.0.10 xlrd=2.0.1 --yes
-
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+# Used by execution script to verify if we are running in a codespace docker environment 
+RUN echo "running in codespace" > /tmp/.is_codespace_env.txt 
