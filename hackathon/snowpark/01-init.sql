@@ -1,7 +1,7 @@
 USE ROLE USERADMIN;
 
 -- Create a user
-CREATE USER IF NOT EXISTS snowpark_user
+CREATE OR REPLACE USER snowpark_user
   PASSWORD = ''
   LOGIN_NAME = 'snowpark_user'
   DISPLAY_NAME = 'Snowpark User'
