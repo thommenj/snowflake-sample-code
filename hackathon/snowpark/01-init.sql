@@ -2,7 +2,7 @@ USE ROLE USERADMIN;
 
 -- Create a user
 CREATE OR REPLACE USER snowpark_user
-  PASSWORD = ''
+  PASSWORD = 'superpassword123'
   LOGIN_NAME = 'snowpark_user'
   DISPLAY_NAME = 'Snowpark User'
   FIRST_NAME = 'Snowpark'
