@@ -8,3 +8,8 @@ CREATE OR REPLACE STORAGE INTEGRATION S3_BUCKET_INTEGRATION
   STORAGE_ALLOWED_LOCATIONS = ('s3://snowflake-ep-hackathon/json/', 's3://snowflake-ep-hackathon/excel/', 's3://snowflake-ep-hackathon/streaming/');
 
 DESCRIBE INTEGRATION S3_BUCKET_INTEGRATION;
+
+USE ROLE ACCOUNTADMIN;
+
+-- Grant access to the S3 bucket to the SYSADMIN role
+GRANT USAGE ON INTEGRATION S3_BUCKET_INTEGRATION TO ROLE SYSADMIN;
